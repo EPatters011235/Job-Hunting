@@ -7,12 +7,12 @@ import configparser
 config = configparser.ConfigParser()
 config.read('jobs.cfg') #jobs.cfg is in the working directory of the script
 config.sections()
-#<test push>
+
 '''
 Things to do:
  1) Add in some type of logging so I don't write the same job posting (probably just a text file)
- 2) Figure outCB Facet's for multiple locations
- 3) Passing a keyword list
+ 2) Figure outCB Facet's for multiple locations || Done
+ 3) Passing a keyword list || Done
  4) Email CB about ExcludeDID option
  5) Add support for other job sites:
     http://www.programmableweb.com/news/70-jobs-apis-indeed-simply-hired-and-careerbuilder/2013/01/23
@@ -31,13 +31,13 @@ def career_builder():
     #NOTE: If you are not using a config file, cb_key = <key_value>
     cb_key = config.get('career builder', 'api_key')
     cb_params = {'DeveloperKey': cb_key,
-                 'HostSite': 'US',
+                 'HostSite': 'US', #Necessary in order to search the correct CB site
                  'CountryCode': 'US',
-                 #'UseFacets': 'true',
-                 #'FacetCity': ['San Diego', 'Denver', 'Phoenix', 'Scottsdale'],
-                 'Location': 'Denver, CO',
-                 'ExcludeCompanyNames': 'ManTech International Corporation',
-                 'Keywords': 'cyber'}
+                 'UseFacets': 'true',
+                 'FacetCity': ['San Diego, Denver, Phoenix, Scottsdale'],
+                 'PerPage': '100',
+                 #'ExcludeCompanyNames': 'ManTech International Corporation',
+                 'Keywords': 'cyber'} #Only jobs that have all of the key words will match and be returned
     #Encode cb_url, cb_key, and cb_params to proper URL
     cb_url_parts = list(parse.urlparse(cb_url))
     cb_query = dict(parse.parse_qsl(cb_url_parts[4]))
@@ -52,6 +52,7 @@ def career_builder():
     xml_input = xmltodict.parse(cb_response)
     cb_json_input = json.dumps(xml_input)
     cb_json_output = json.loads(cb_json_input)
+    pprint(cb_json_output)
     #Bevs on the beach
     for jobs in cb_json_output['ResponseJobSearch']['Results']['JobSearchResult']:
         job_title = {'title': jobs['JobTitle']}.get('title', 'Missing')
@@ -61,7 +62,12 @@ def career_builder():
         emp_type = {'emp_type': jobs['EmploymentType']}.get('emp_type', 'Missing')
         job_url = {'job_url': jobs['JobDetailsURL']}.get('job_url', 'Missing')
         salary = {'salary': jobs['Pay']}.get('salary', 'Missing')
-        skills = {'skills': ', '.join(jobs['Skills']['Skill'])}.get('skills', 'Missing')
+        #Probably a better way to handle this but oh well
+        if type(jobs['Skills']['Skill']) == list:
+            skills = {'skills': ', '.join(jobs['Skills']['Skill'])}.get('skills', 'Missing')
+        else:
+            skills = {'skills': str(jobs['Skills']['Skill'])}.get('skills', 'Missing')
+            print(skills)
         cb_data = [job_title,
                    description,
                    city,
