@@ -7,7 +7,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('jobs.cfg') #jobs.cfg is in the working directory of the script
 config.sections()
-
+#<test push>
 '''
 Things to do:
  1) Add in some type of logging so I don't write the same job posting (probably just a text file)
