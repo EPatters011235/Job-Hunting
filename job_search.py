@@ -89,7 +89,8 @@ def file_creator(cb_tmp):
     if cb_tmp:
         #Write headers
         cb_ws = wb.add_sheet('Career Builder')
-        cb_headers = ['Job Title', 'Description', 'City', 'State', 'Employment Type', 'Job URL', 'Salary', 'Skills']
+        cb_headers = ['Job Title', 'Description', 'City', 'State', 'Employment Type',
+                      'Job URL', 'Salary', 'Skills', 'Reviewed', 'Applied']
         (x, y) = (0, 0)
         for cb_column in cb_headers:
             cb_ws.write(x, y, cb_column)
